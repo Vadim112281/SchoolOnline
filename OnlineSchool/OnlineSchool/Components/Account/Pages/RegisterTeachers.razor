@@ -1,0 +1,289 @@
+﻿@page "/Account/Register/Teacher"
+
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
+@using OnlineSchool.Data
+@using OnlineSchool.Enum
+@using OnlineSchool.Models
+@using OnlineSchool.Services.StudentsServices
+@using OnlineSchool.Services.TeachersServices
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IEmailSender<ApplicationUser> EmailSender
+@inject ILogger<Register> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+@inject ITeacherService TeacherService
+
+<PageTitle>Реєстрація</PageTitle>
+
+
+<div class="register_content">
+    <div class="register_content_block">
+        <h1 class="register_content_header_teacher">Реєстрація вчителів</h1>
+
+        <div class="register_block_form">
+            <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+                <DataAnnotationsValidator />
+                <div class="register_content_inputs">
+                    <div class="inputs_first">
+                        <InputText class="register_inputs_item" @bind-Value="Input.LastName" placeholder="Прізвище" />
+                        <ValidationMessage @bind-Value="errorMessage" For="() => Input.LastName" class="text-danger" />
+
+                        <InputText class="register_inputs_item" @bind-Value="Input.FirstName" placeholder="Ім'я" />
+                        <ValidationMessage @bind-Value="errorMessage" For="() => Input.FirstName" class="text-danger" />
+
+                        <InputText class="register_inputs_item" @bind-Value="Input.MediumName" placeholder="По батькові" />
+                        <ValidationMessage @bind-Value="errorMessage" For="() => Input.MediumName" class="text-danger" />
+
+                        <InputSelect class="input_select_subject" @bind-Value="Input.RoleOfTeacher">
+                            @foreach(var item in optionsRolesOfTeachers)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </InputSelect>
+
+                    </div>
+                    <div class="inputs_second">
+                        <InputText class="register_inputs_item" @bind-Value="Input.Email" placeholder="Пошта" />
+                        <ValidationMessage For="() => Input.Email" class="text-danger" />
+
+                        <InputText type="password" class="register_inputs_item" @bind-Value="Input.Password" placeholder="Пароль" />
+                        <ValidationMessage For="() => Input.Password" class="text-danger" />
+
+                        <InputText class="register_inputs_item" @bind-Value="Input.ConfirmPassword" placeholder="Повторити пароль" />
+                        <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+
+
+                        <InputSelect class="input_select_subject" @bind-Value="Input.SubjectOfTeacher">
+                            @foreach (var item in optionsOfSubjectForTeacher)
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+
+                <div class="register_btn">
+                    <button type="submit" class="register_btn_button">Додати учня</button>
+                </div>
+
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@* @if(errorMessage != string.Empty)
+{
+    <style>
+        .register_content_header{
+            margin-left:0px;
+        }
+    </style>
+} *@
+
+
+@code {
+    string errorMessage = string.Empty;
+
+
+    private IEnumerable<IdentityError>? identityErrors;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+
+    private List<Option> optionsOfSubjectForTeacher = new List<Option>
+    {
+        new Option {Value = "1", Text = "Українська мова"},
+        new Option {Value = "2", Text = "Математика"},
+        new Option {Value = "3", Text = "Українська література"},
+        new Option {Value = "4", Text = "Біологія"},
+        new Option {Value = "5", Text = "Фізика"},
+        new Option {Value = "6", Text = "Хімія"},
+        new Option {Value = "7", Text = "Зарубіжна література"},
+        new Option {Value = "8", Text = "Історія України"},
+        new Option {Value = "9", Text = "Географія"}
+    };
+
+    private List<Option> optionsRolesOfTeachers = new List<Option>
+    {
+        new Option { Value = "1", Text = "Вчитель" },
+        new Option { Value = "2", Text = "Завуч" },
+        new Option { Value = "3", Text = "Директор" }
+    };
+
+    public class Option
+    {
+        public string Value { get; set; }
+        public string Text { get; set; }
+    }
+
+    public async Task RegisterUser(EditContext editContext)
+    {
+
+
+        var user = CreateUser();
+        user.FirstName = Input.FirstName;
+        user.LastName = Input.LastName;
+        user.MediumName = Input.MediumName;
+
+        Teacher teacher = new Teacher();
+
+        teacher.FirstName = user.FirstName;
+        teacher.MediumName = user.MediumName;
+        teacher.LastName = user.LastName;
+        if(Input.RoleOfTeacher == "1")
+        {
+            teacher.RoleOfTeacher = RoleOfTeachers.Teacher;
+        }
+        else if (Input.RoleOfTeacher == "2")
+        {
+            teacher.RoleOfTeacher = RoleOfTeachers.HeadTeacher;
+        }
+        else if (Input.RoleOfTeacher == "3")
+        {
+            teacher.RoleOfTeacher = RoleOfTeachers.HeadMaster;
+        }
+
+
+
+        if (Input.SubjectOfTeacher == "1")
+        {
+            teacher.SubjectOfTeacher = AllSubjects.UkrLanguage;
+        }
+        else if (Input.SubjectOfTeacher == "2")
+        {
+            teacher.SubjectOfTeacher = AllSubjects.Math;
+        }
+        else if (Input.SubjectOfTeacher == "3")
+        {
+            teacher.SubjectOfTeacher = AllSubjects.UkrLiterature;
+        }
+        else if (Input.SubjectOfTeacher == "4")
+        {
+            teacher.SubjectOfTeacher = AllSubjects.Biology;
+        }
+        else if (Input.SubjectOfTeacher == "5")
+        {
+            teacher.SubjectOfTeacher = AllSubjects.Physics;
+        }
+        else if (Input.SubjectOfTeacher == "6")
+        {
+            teacher.SubjectOfTeacher = AllSubjects.Chemistry;
+        }
+        else if (Input.SubjectOfTeacher == "7")
+        {
+            teacher.SubjectOfTeacher = AllSubjects.WorldLiteratue;
+        }
+        else if (Input.SubjectOfTeacher == "8")
+        {
+            teacher.SubjectOfTeacher = AllSubjects.UkrHistory;
+        }
+        else if (Input.SubjectOfTeacher == "9")
+        {
+            teacher.SubjectOfTeacher = AllSubjects.Geography;
+        }
+
+
+        await TeacherService.AddTeacher(teacher);
+
+        await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+        var emailStore = GetEmailStore();
+        await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+        var result = await UserManager.CreateAsync(user, Input.Password);
+
+        if (!result.Succeeded)
+        {
+            identityErrors = result.Errors;
+            return;
+        }
+
+        Logger.LogInformation("User created a new account with password.");
+
+        var userId = await UserManager.GetUserIdAsync(user);
+        var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+        var callbackUrl = NavigationManager.GetUriWithQueryParameters(
+            NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
+            new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+
+        await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+
+        if (UserManager.Options.SignIn.RequireConfirmedAccount)
+        {
+            RedirectManager.RedirectTo(
+                "Account/RegisterConfirmation",
+                new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+        }
+
+        await SignInManager.SignInAsync(user, isPersistent: false);
+        RedirectManager.RedirectTo(ReturnUrl);
+    }
+
+    private ApplicationUser CreateUser()
+    {
+        try
+        {
+            return Activator.CreateInstance<ApplicationUser>();
+        }
+        catch
+        {
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+        }
+    }
+
+    private IUserEmailStore<ApplicationUser> GetEmailStore()
+    {
+        if (!UserManager.SupportsUserEmail)
+        {
+            throw new NotSupportedException("The default UI requires a user store with email support.");
+        }
+        return (IUserEmailStore<ApplicationUser>)UserStore;
+    }
+
+    private sealed class InputModel
+    {
+        [Required(ErrorMessage = "Ви пропустили поле")]
+        [StringLength(15, ErrorMessage = "Ви ввели багато символів.", MinimumLength = 2)]
+        public string FirstName { get; set; } = "";
+
+        [Required(ErrorMessage = "Ви пропустили поле")]
+        [StringLength(15, ErrorMessage = "Ви ввели багато символів.", MinimumLength = 2)]
+        public string MediumName { get; set; } = "";
+
+        [Required(ErrorMessage = "Ви пропустили поле")]
+        [StringLength(15, ErrorMessage = "Ви ввели багато символів.", MinimumLength = 2)]
+        public string LastName { get; set; } = "";
+
+        public string RoleOfTeacher { get; set; } = "";
+
+        public string SubjectOfTeacher { get; set; } = "";
+
+        [Required(ErrorMessage = "Ви пропустили поле")]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Ви пропустили поле")]
+        [StringLength(100, ErrorMessage = "Введіть коректний пароль.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "Паролі не співпали.")]
+        public string ConfirmPassword { get; set; } = "";
+    }
+}

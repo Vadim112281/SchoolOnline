@@ -1,0 +1,127 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using OnlineSchool.Components.Account
+@using OnlineSchool.Data
+@using OnlineSchool.Models
+@using OnlineSchool.Services.StudentsServices
+@using OnlineSchool.Services.TeachersServices
+
+@implements IDisposable
+
+
+@rendermode InteractiveServer
+
+@inject NavigationManager NavigationManager
+
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IdentityUserAccessor UserAccessor
+@inject IdentityRedirectManager RedirectManager
+
+@inject IStudentService StudentService
+@inject ITeacherService TeacherService
+
+
+<AuthorizeView>
+    <NotAuthorized>
+        <div class="nav_menu">
+            <div class="nav_name">
+                <h1 class="nav_name_text">Matok School</h1>
+            </div>
+
+            <div class="nav_link">
+                <a href="/" style="text-decoration:none;">
+                    <h3 class="nav_link_text">Головна</h3>
+                </a>
+            </div>
+
+            <div class="nav_link">
+                <h3 class="nav_link_text">Про школу</h3>
+            </div>
+
+            <div class="nav_link">
+                <h3 class="nav_link_text">Вчителя</h3>
+            </div>
+
+            <div class="nav_link">
+                <h3 class="nav_link_text">Підтримка</h3>
+            </div>
+
+            <div class="nav_link">
+                <button @onclick="GoToLogin" class="nav_button_login">Увійти</button>
+            </div>
+        </div>
+    </NotAuthorized>
+    <Authorized>
+        <div class="nav_menu">
+            <div class="nav_name">
+                <h1 class="nav_name_text">Matok School</h1>
+            </div>
+
+            <div class="nav_link">
+                <a href="/" style="text-decoration:none;">
+                    <h3 class="nav_link_text">Головна</h3>
+                </a>
+            </div>
+
+            <div class="nav_link">
+                <h3 class="nav_link_text">Мій клас</h3>
+            </div>
+
+            <div class="nav_link">
+                <h3 class="nav_link_text">Щоденник</h3>
+            </div>
+
+            <div class="nav_link">
+                <h3 class="nav_link_text">Журнал</h3>
+            </div>
+
+            <div class="nav_link">
+               <form action="Account/Logout" method="post">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                    <button type="submit" class="nav_button_login">Вийти</button>
+                </form>
+            </div>
+
+@*             <form action="Account/Logout" method="post">
+                <AntiforgeryToken />
+                <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                <button type="submit" class="nav-link">
+                    <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                </button>
+            </form> *@
+        </div>
+    </Authorized>
+
+</AuthorizeView>
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    private void GoToLogin()
+    {
+        NavigationManager.NavigateTo("/Account/Login/Student");
+    }
+
+
+
+}
+

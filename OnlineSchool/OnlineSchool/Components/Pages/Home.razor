@@ -1,0 +1,33 @@
+﻿@page "/"
+
+@inject NavigationManager NavigationManager 
+@rendermode InteractiveServer
+
+<PageTitle>Matok School</PageTitle>
+
+<div class="home_img"></div>
+
+<div class="home_content">
+    <div class="home_text">
+        <h1 class="home_text_school_name">Matok School</h1>
+        <h1 class="home_text_text">Школа Онлайн!</h1>
+    </div>
+    <div class="home_buttons">
+        <button @onclick="GoToLoginStudent" class="home_btn_student">Увійти як учень</button>
+        <button @onclick="GoToLoginTeacher" class="home_btn_teacher">Увійти як вчитель</button>
+    </div>
+</div>  
+
+
+@code{
+    private void GoToLoginStudent()
+    {
+        NavigationManager.NavigateTo("Account/Login/Student");
+    }
+
+    private void GoToLoginTeacher()
+    {
+        NavigationManager.NavigateTo("Account/Login/Teacher");
+    }
+}
+

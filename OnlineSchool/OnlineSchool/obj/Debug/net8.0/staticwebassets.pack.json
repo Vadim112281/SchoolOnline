@@ -1,0 +1,49 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\MyProjects\\OnlineSchool\\OnlineSchool\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\OnlineSchool.bundle.scp.css",
+      "PackagePath": "staticwebassets\\OnlineSchool.bundle.scp.css"
+    },
+    {
+      "Id": "D:\\MyProjects\\OnlineSchool\\OnlineSchool\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "D:\\MyProjects\\OnlineSchool\\OnlineSchool\\wwwroot\\back_register_student.jpg",
+      "PackagePath": "staticwebassets\\back_register_student.jpg"
+    },
+    {
+      "Id": "D:\\MyProjects\\OnlineSchool\\OnlineSchool\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "D:\\MyProjects\\OnlineSchool\\OnlineSchool\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "D:\\MyProjects\\OnlineSchool\\OnlineSchool\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "D:\\MyProjects\\OnlineSchool\\OnlineSchool\\wwwroot\\photo_2024-08-13_13-30-44.jpg",
+      "PackagePath": "staticwebassets\\photo_2024-08-13_13-30-44.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.OnlineSchool.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.OnlineSchool.props",
+      "PackagePath": "build\\OnlineSchool.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.OnlineSchool.props",
+      "PackagePath": "buildMultiTargeting\\OnlineSchool.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.OnlineSchool.props",
+      "PackagePath": "buildTransitive\\OnlineSchool.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
